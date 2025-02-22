@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+
+# Flask instance folder
+instance/
+
+# Distribution / packaging
+.eggs/
+dist/
+build/
+*.egg-info/
+
+# Log and temp files
+*.log
+*.tmp
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Pytest cache
+.pytest_cache/
+
+# Coverage data
+.coverage
+htmlcov/
+
+# Editor-specific files (customize as needed)
+.vscode/
+*.idea
+*.sublime-project
+*.sublime-workspace
