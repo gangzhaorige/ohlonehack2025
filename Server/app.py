@@ -11,24 +11,7 @@ app = Flask(__name__)
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-@app.route('/generate', methods=['POST'])
-def generate_response():
-    data = request.get_json()
-    prompt = data.get("prompt", "")
-    
-    if not prompt:
-        return {"error": "Prompt is required"}, 400
-    
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        generated_text = response.choices[0].message.content
-        return {"response": generated_text}
-    except Exception as e:
-        return {"error": str(e)}, 500
-    
+# Endpoint to determine corrct answer and explain user's choice accordingly
 @app.route('/generate-explain', methods=['POST'])
 def generate_explain():
     data = request.get_json()
