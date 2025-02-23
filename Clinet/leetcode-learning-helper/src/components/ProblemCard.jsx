@@ -28,7 +28,7 @@ export const ProblemCard = ({ problem, onStatementSubmit }) => {
       setShowStatement(false);
 
       // Pass questions to parent component
-      onStatementSubmit(data.questions);
+      onStatementSubmit(data.questions, statement);
     } catch (error) {
       console.error("Error submitting statement:", error);
     }

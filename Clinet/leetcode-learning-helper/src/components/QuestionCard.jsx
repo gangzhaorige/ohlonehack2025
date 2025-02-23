@@ -12,8 +12,51 @@ import {
   FormControl,
   Box,
 } from '@mui/material';
+let question = ''
+let answer = ''
 
-export const QuestionCard = ({ question, onAnswerChange, onSubmit, answer, feedback }) => (
+
+const QuestionCard = ({ question, onAnswerChange, onSubmit,originalQuestion, answer, feedback }) => {
+  const handleStatementSubmit = async () => {
+    console.log({
+      question: `${question.question} for the problem: ${originalQuestion}`,
+      options: {
+        ...question.options,
+      },
+      user_selection: answer
+    });
+    try {
+      const response = await fetch("http://localhost:3005/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: question.question,
+          options: 
+            question.options,
+          
+          user_selection: answer,
+        }),
+      });
+      
+  
+      const data = await response.json();
+      console.log("Received response from server:", data);
+  
+      // Show the explanation and hide the statement input
+      // setExplanation(data.explanation);
+      // setShowStatement(false);
+  
+      // Pass questions to parent component
+      // onStatementSubmit(data.questions);
+    } catch (error) {
+      console.error("Error submitting statement:", error);
+    }
+  };
+  
+ 
+  return(
   <Card sx={{ mb: 2, p: 3 }}>
     {/* 问题标题 */}
     <Typography variant="h6" gutterBottom>
@@ -42,7 +85,7 @@ export const QuestionCard = ({ question, onAnswerChange, onSubmit, answer, feedb
     <Button 
       variant="contained" 
       color="primary"
-      onClick={onSubmit}
+      onClick={handleStatementSubmit}
       disabled={!answer}
     >
       Submit Answer
@@ -68,5 +111,7 @@ export const QuestionCard = ({ question, onAnswerChange, onSubmit, answer, feedb
         </Typography>
       </Paper>
     )}
-  </Card>
-);
+  </Card>)
+};
+
+export default QuestionCard;

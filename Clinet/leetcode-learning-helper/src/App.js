@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Timer } from "./components/Timer";
 import { ProblemCard } from "./components/ProblemCard";
-import { QuestionCard } from "./components/QuestionCard";
 import { Report } from "./components/Report";
+import  QuestionCard  from "./components/QuestionCard";
 import { formatTime } from "./utils/timeFormatter";
 // import { mockProblems } from './data/mockProblems';
 import { getRandomProblems } from "./data/mockProblems";
@@ -33,6 +33,7 @@ function App() {
   const [report, setReport] = useState(null);
   const [reportLoading, setReportLoading] = useState(false);
   const [, forceUpdate] = useState({});
+  let [originalQuestion, setOriginalQuestion] = useState('');
 
   // 计时器逻辑
   useEffect(() => {
@@ -124,8 +125,9 @@ function App() {
     }
   };
 
-  const handleStatementSubmit = (newQuestions) => {
+  const handleStatementSubmit = (newQuestions, originalQuestion) => {
     setQuestions(newQuestions);
+    setOriginalQuestion(originalQuestion)
   };
 
   const handleAnswerChange = (questionId, value) => {
@@ -187,6 +189,7 @@ function App() {
               <QuestionCard
                 key={question.id || index}
                 question={question}
+                originalQuestion={originalQuestion}
                 onAnswerChange={(value) =>
                   handleAnswerChange(question.id, value)
                 }
