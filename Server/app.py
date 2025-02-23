@@ -3,13 +3,8 @@ from flask import Flask, request
 from openai import OpenAI
 from dotenv import load_dotenv
 
-load_dotenv(), request, jsonify
-import requests
+load_dotenv()
 import os
-
-# Set your OpenAI API key
-OPENAI_API_KEY = "api key"
-OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
 
 app = Flask(__name__)
 
@@ -55,6 +50,46 @@ def generate_explain():
     except Exception as e:
         return {"error": str(e)}, 500
     
+
+
+
+@app.route('/generate-recommendation', methods=['POST'])
+def generate_recommendation():
+    data = request.get_json()
+    total_questions = data.get("total_questions", 0)
+    correct_answers = data.get("correct_answers", 0)
+    user_answers = data.get("user_answers", [])  # List of question-answer pairs
+    
+    if total_questions <= 0 or correct_answers < 0 or correct_answers > total_questions:
+        return {"error": "Invalid input format"}, 400
+    
+    incorrect_questions = [entry for entry in user_answers if not entry.get("correct", False)]
+    topics = []
+    
+    for entry in incorrect_questions:
+        question = entry.get("question", "")
+        answer = entry.get("answer", "")
+        prompt = f"Identify the main topic of the following question-answer pair and suggest a study recommendation:\n\nQuestion: {question}\nUser Answer: {answer}\n\nProvide the topic and a brief study recommendation."
+        
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            topic_recommendation = response.choices[0].message.content
+            topics.append(topic_recommendation)
+        except Exception as e:
+            print(f"Error generating topic recommendation: {e}")
+            topics.append("Error generating topic recommendation.")
+    
+    if topics:
+        recommendation = "Here are some areas you should focus on: " + " ".join(topics)
+    else:
+        recommendation = "Excellent work! You have a strong grasp of all topics. Keep practicing to maintain your knowledge."
+    
+    return {"correct_answers": correct_answers, "total_questions": total_questions, "recommendation": recommendation}
+
+    
 if __name__ == '__main__':
     app.run(debug=True)
 
@@ -75,28 +110,3 @@ if __name__ == '__main__':
 
 
 
-@app.route("/generate report", methods=["POST"])
-def ask_openai():
-    try:
-        data = request.json
-        prompt = data.get("prompt", "")
-        if not prompt:
-            return jsonify({"error": "Prompt is required"}), 400
-        
-        headers = {
-            "Authorization": f"Bearer {OPENAI_API_KEY}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": "gpt-3.5-turbo",
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.7
-        }
-        
-        response = requests.post(OPENAI_API_URL, headers=headers, json=payload)
-        response_data = response.json()
-        
-        return jsonify(response_data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
